@@ -2,9 +2,7 @@ import tkinter as tk
 from tkinter import ttk, colorchooser, messagebox
 import math
 
-# ─────────────────────────────────────────────
-#  DEFAULT THEME
-# ─────────────────────────────────────────────
+
 DEFAULT_THEME = {
     "bg":          "#1a1a2e",
     "display_bg":  "#16213e",
@@ -26,9 +24,6 @@ DEFAULT_THEME = {
 theme = DEFAULT_THEME.copy()
 
 
-# ─────────────────────────────────────────────
-#  CALCULATOR LOGIC
-# ─────────────────────────────────────────────
 class Calculator:
     def __init__(self):
         self.reset()
@@ -115,9 +110,7 @@ class Calculator:
         return s
 
 
-# ─────────────────────────────────────────────
 #  GUI
-# ─────────────────────────────────────────────
 class CalcApp(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -129,7 +122,6 @@ class CalcApp(tk.Tk):
 
     # ── Layout ────────────────────────────────
     def _build_ui(self):
-        # ── Top bar (theme customiser button)
         bar = tk.Frame(self, pady=4)
         bar.pack(fill="x")
         tk.Button(bar, text="🎨  Customize Theme",
@@ -137,26 +129,23 @@ class CalcApp(tk.Tk):
                   relief="flat", cursor="hand2",
                   font=theme["font_small"]).pack(side="right", padx=8)
 
-        # ── Expression label (shows pending op)
         self.expr_var = tk.StringVar(value="")
         self.expr_lbl = tk.Label(self, textvariable=self.expr_var,
                                  anchor="e", padx=12, height=1)
         self.expr_lbl.pack(fill="x")
 
-        # ── Main display
         self.display_var = tk.StringVar(value="0")
         self.display = tk.Entry(self, textvariable=self.display_var,
                                 justify="right", state="readonly",
                                 bd=0, relief="flat", readonlybackground="#16213e")
         self.display.pack(fill="x", ipady=12, padx=8)
 
-        # ── Button grid
         btn_frame = tk.Frame(self)
         btn_frame.pack(padx=8, pady=8)
 
-        # Row layout: (label, col, row, kind, colspan)
+
         buttons = [
-            # Row 0 – clear / special
+    
             ("C",   0, 0, "clr"),  ("⌫",  1, 0, "clr"),
             ("%",   2, 0, "op"),   ("÷",  3, 0, "op"),
             # Row 1
@@ -185,14 +174,11 @@ class CalcApp(tk.Tk):
             b.grid(row=row, column=col, padx=4, pady=4)
             self.buttons[lbl] = (b, kind)
 
-            # Hover effect
             b.bind("<Enter>", lambda e, w=b: w.config(bg=theme["btn_hover"]))
             b.bind("<Leave>", lambda e, w=b, k=kind: self._reset_btn_color(w, k))
 
-        # Keyboard bindings
         self.bind("<Key>", self._key_press)
 
-    # ── Press handling ─────────────────────────
     def _press(self, label):
         c = self.calc
         if   label in "0123456789": c.input_digit(label)
@@ -232,14 +218,13 @@ class CalcApp(tk.Tk):
             self.expr_var.set(f"{c._fmt(c.stored)} {c.operator}")
         else:
             self.expr_var.set("")
-
-    # ── Theme ──────────────────────────────────
+    
     def _apply_theme(self):
         t = theme
         self.config(bg=t["bg"])
         for widget in self.winfo_children():
             self._style_widget(widget, t)
-        # buttons
+
         for lbl, (btn, kind) in self.buttons.items():
             if   kind == "num": bg, fg = t["btn_num_bg"], t["btn_num_fg"]
             elif kind == "op":  bg, fg = t["btn_op_bg"],  t["btn_op_fg"]
@@ -247,7 +232,7 @@ class CalcApp(tk.Tk):
             else:               bg, fg = t["btn_clr_bg"], t["btn_clr_fg"]
             btn.config(bg=bg, fg=fg, activebackground=t["btn_hover"],
                        activeforeground=fg, font=t["font_btn"])
-        # display
+
         self.display.config(
             font=t["font_display"],
             fg=t["display_fg"],
@@ -271,7 +256,7 @@ class CalcApp(tk.Tk):
         else:               bg = t["btn_clr_bg"]
         btn.config(bg=bg)
 
-    # ── Theme editor ───────────────────────────
+
     def _open_theme_editor(self):
         win = tk.Toplevel(self)
         win.title("🎨 Theme Editor")
@@ -315,7 +300,6 @@ class CalcApp(tk.Tk):
                       relief="flat", font=("Courier New", 10),
                       cursor="hand2").grid(row=i, column=2, padx=6, pady=3)
 
-        # Preset themes
         presets_frame = tk.LabelFrame(win, text=" Presets ",
                                       bg=theme["bg"], fg="#aaa",
                                       font=("Courier New", 10))
@@ -362,7 +346,7 @@ class CalcApp(tk.Tk):
                       font=("Courier New", 10), cursor="hand2",
                       padx=8, pady=4).pack(side="left", padx=6, pady=6)
 
-        # Apply button
+
         def apply_and_close():
             self._apply_theme()
             win.destroy()
@@ -375,7 +359,6 @@ class CalcApp(tk.Tk):
                       row=len(color_keys)+1, column=0, columnspan=3,
                       padx=12, pady=10, sticky="ew")
 
-    # ── History window ─────────────────────────
     def _show_history(self):
         win = tk.Toplevel(self)
         win.title("📜 Calculation History")
@@ -411,9 +394,7 @@ class CalcApp(tk.Tk):
                   cursor="hand2").pack(pady=(0, 10))
 
 
-# ─────────────────────────────────────────────
 #  ENTRY POINT
-# ─────────────────────────────────────────────
 if __name__ == "__main__":
     app = CalcApp()
     app.mainloop()
